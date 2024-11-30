@@ -109,6 +109,12 @@
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>3.3.0</version>
+          <configuration>
+            <includes>
+              <!-- Include tests like UserServiceTest -->
+              <include>**/*ServiceTest.java</include>
+            </includes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
