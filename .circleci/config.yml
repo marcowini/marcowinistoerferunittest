@@ -20,7 +20,8 @@ jobs:
       - checkout
       - run:
           name: Run Unit Tests
-          command: mvn -f ~/project/unittest/pom.xml test -Dtest=com.mayab.quality.unittest.service.UserServiceTest
+          mvn -f ~/marcowinistoerferunittest/unittest/pom.xml test -Dtest=com.mayab.quality.unittest.service.UserServiceTest
+
 
   integration_test:
     working_directory: ~/project
