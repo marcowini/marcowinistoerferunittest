@@ -1,44 +1,116 @@
-package com.mayab.quality.integration;
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-// Necessary imports...
+  <groupId>com.mayab.calidad</groupId>
+  <artifactId>Calculadora</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
 
-class UserServiceTest extends DBTestCase {
+  <name>Calculadora</name>
+  <url>http://www.example.com</url>
 
-    public UserServiceTest() {
-        System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, "com.mysql.cj.jdbc.Driver");
-        System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, "jdbc:mysql://localhost:3306/calidad2024");
-        System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, "root");
-        System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, "root");
-    }
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+  </properties>
 
-    private IDAOUser dao;
-    private UserService service;
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.11.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-    @BeforeEach
-    protected void setup() throws Exception {
-        dao = new UserMySqlDao();
-        service = new UserService(dao);
+  <dependencies>
+    <!-- Testing and mocking dependencies -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.12.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
 
-        IDatabaseConnection connection = getConnection();
-        try {
-            DatabaseOperation.TRUNCATE_TABLE.execute(connection, getDataSet());
-            DatabaseOperation.CLEAN_INSERT.execute(connection, getDataSet());
-        } finally {
-            connection.close();
-        }
-    }
+    <!-- DBUnit for database testing -->
+    <dependency>
+      <groupId>org.dbunit</groupId>
+      <artifactId>dbunit</artifactId>
+      <version>2.7.0</version>
+      <scope>test</scope>
+    </dependency>
 
-    protected IDataSet getDataSet() throws Exception {
-        return new FlatXmlDataSetBuilder().build(new FileInputStream("src/resources/initDB.xml"));
-    }
+    <!-- MySQL Connector -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.32</version>
+    </dependency>
 
-    @Test
-    public void testCreateUser_HappyPath() {
-        User user = new User("hola", "hola@gmail.com", "pass1234");
-        User createdUser = service.createUser("hola", "hola@gmail.com", "pass1234");
-        assertNotNull(createdUser);
-        assertEquals("hola", createdUser.getName());
-    }
+    <!-- Logging dependency -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.36</version>
+    </dependency>
 
-    // Other tests omitted for brevity...
-}
+    <!-- Selenium and WebDriverManager dependencies -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>4.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>5.3.2</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Clean plugin -->
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <!-- Compiler plugin -->
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.13.0</version>
+        </plugin>
+        <!-- Surefire plugin for unit tests -->
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+        <!-- Failsafe plugin for integration tests -->
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
