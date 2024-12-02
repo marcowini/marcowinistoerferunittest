@@ -1,17 +1,17 @@
 version: 2.1
 
+orbs:
+  browser-tools: circleci/browser-tools@1.4.9
+
 jobs:
-  build:
+  build-and-test:
     docker:
-      - image: cimg/openjdk:17.0  # Ensure Java 17 compatibility
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
       - run:
-          name: Debug Working Directory
-          command: ls -la
-      - run:
-          name: Build
-          command: cd unittest && mvn -B -DskipTests clean package
+          name: Clean and Build
+          command: mvn -f unittest/pom.xml clean package -DskipTests
 
   unit_test:
     docker:
@@ -19,11 +19,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Debug Working Directory
-          command: ls -la
-      - run:
           name: Run Unit Tests
-          command: cd unittest && mvn -f ./pom.xml test -Dtest=com.mayab.quality.unittest.service.UserServiceTest
+          command: mvn -f unittest/pom.xml test -Dtest=com.mayab.quality.unittest.service.UserServiceTest
 
   integration_test:
     docker:
@@ -37,9 +34,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Debug Working Directory
-          command: ls -la
-      - run:
           name: Wait for MySQL to Start
           command: |
             for i in $(seq 1 30); do
@@ -52,28 +46,25 @@ jobs:
             fi
       - run:
           name: Run Integration Tests
-          command: cd unittest && mvn -f ./pom.xml failsafe:integration-test -Dit.test=com.mayab.quality.integration.UserServiceTest
+          command: mvn -f unittest/pom.xml failsafe:integration-test -Dtest=com.mayab.quality.integration.UserServiceTest
 
   selenium_test:
-    docker:
-      - image: cimg/openjdk:17.0
-      - image: selenium/standalone-chrome:latest
+    docker: 
+      - image: cimg/openjdk:17.0-browsers
     steps:
       - checkout
-      - run:
-          name: Debug Working Directory
-          command: ls -la
+      - browser-tools/install-browser-tools
       - run:
           name: Run Selenium Functional Tests
-          command: cd unittest && mvn -f ./pom.xml verify -P selenium -Dtest=com.mayab.quality.functional.CRUDSeleniumTest
+          command: mvn -f unittest/pom.xml verify -Dtest=com.mayab.quality.functional.CRUDSeleniumTest
 
 workflows:
   build_and_test:
     jobs:
-      - build
+      - build-and-test
       - unit_test:
           requires:
-            - build
+            - build-and-test
       - integration_test:
           requires:
             - unit_test
